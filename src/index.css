@@ -1,0 +1,18 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@media print {
+    /* Esta clase oculta los elementos que no queremos imprimir */
+    .no-print {
+        display: none !important;
+    }
+
+    /* El área de impresión se ajusta para la hoja */
+    .printable-area {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+    }
+}
