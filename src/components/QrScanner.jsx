@@ -2,49 +2,55 @@ import React, { useEffect, useRef } from 'react';
 import { Html5QrcodeScanner } from 'html5-qrcode';
 
 function QrScanner({ onScanSuccess }) {
-    const scannerRef = useRef(null);
+    const scannerRef = useRef(null); // Use a ref to hold the scanner instance
 
     useEffect(() => {
-        // Usamos un temporizador para asegurarnos de que el DOM esté completamente listo
-        const timeoutId = setTimeout(() => {
-            // Solo inicializa el escáner si no existe ya una instancia
-            if (!scannerRef.current) {
-                const scanner = new Html5QrcodeScanner(
-                    "qr-reader", // ID del div donde se renderizará
-                    { fps: 10, qrbox: { width: 250, height: 250 } },
-                    false // verbose
-                );
+        // Ensure the logic runs only once when the component mounts
+        if (scannerRef.current) {
+            return;
+        }
 
-                const success = (decodedText) => {
-                    // Detiene el escáner para evitar re-escaneos y llama a la función de éxito
-                    if (scannerRef.current) {
-                        scannerRef.current.clear().catch(error => {
-                            console.error("Fallo al limpiar el escáner después del éxito.", error);
-                        });
-                        scannerRef.current = null; // Marca el escáner como limpiado
-                        onScanSuccess(decodedText);
-                    }
-                };
+        // Create a new scanner instance
+        const scanner = new Html5QrcodeScanner(
+            "qr-reader", // ID of the div to render into
+            {
+                fps: 10,
+                qrbox: { width: 250, height: 250 },
+            },
+            false // verbose
+        );
 
-                const error = (err) => {
-                    // Ignora los errores comunes de "QR no encontrado" que ocurren en cada frame
-                };
-
-                scanner.render(success, error);
-                scannerRef.current = scanner; // Guarda la instancia del escáner en la referencia
+        // Define the success callback
+        const success = (decodedText) => {
+            // Ensure we have a scanner instance to clear
+            if (scannerRef.current) {
+                scanner.clear().catch(error => {
+                    console.error("Failed to clear scanner after success.", error);
+                });
+                onScanSuccess(decodedText);
             }
-        }, 100); // Un pequeño retraso de 100 milisegundos
+        };
 
-        // Función de limpieza para detener la cámara si el componente se desmonta
+        // Define the error callback (can be left empty)
+        const error = (err) => {
+            // This function is called frequently, so it's best to keep it quiet
+        };
+
+        // Start the scanner
+        scanner.render(success, error);
+
+        // Store the scanner instance in the ref
+        scannerRef.current = scanner;
+
+        // Define the cleanup function for when the component unmounts
         return () => {
-            clearTimeout(timeoutId); // Limpia el temporizador si el componente se desmonta antes de que se ejecute
             if (scannerRef.current) {
                 scannerRef.current.clear().catch(error => {
-                    console.error("Fallo al limpiar el escáner al desmontar.", error);
+                    console.error("Failed to clear scanner on unmount.", error);
                 });
             }
         };
-    }, [onScanSuccess]);
+    }, [onScanSuccess]); // The dependency array is correct
 
     return <div id="qr-reader" className="w-full"></div>;
 }
