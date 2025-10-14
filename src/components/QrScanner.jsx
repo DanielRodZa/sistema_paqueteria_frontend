@@ -17,7 +17,7 @@ function QrScanner({ onScanSuccess }) {
                 fps: 10,
                 qrbox: { width: 250, height: 250 },
             },
-            false // verbose
+            true // verbose
         );
 
         // Define the success callback
@@ -33,7 +33,7 @@ function QrScanner({ onScanSuccess }) {
 
         // Define the error callback (can be left empty)
         const error = (err) => {
-            // This function is called frequently, so it's best to keep it quiet
+            console.error(err);
         };
 
         // Start the scanner
