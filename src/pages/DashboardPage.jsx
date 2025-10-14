@@ -303,7 +303,7 @@ function DashboardPage() {
                 <NewOperationForm onSuccess={handleFormSuccess} />
             </Modal>
             <Modal isOpen={isScannerOpen} onClose={() => setIsScannerOpen(false)} title="Escanear QR del Paquete">
-                <QrScanner onScanSuccess={handleValidationScanSuccess} />
+                {isScannerOpen && <QrScanner onScanSuccess={handleValidationScanSuccess} />}
             </Modal>
             <Modal isOpen={!!selectedOperation} onClose={() => setSelectedOperation(null)} title="Detalles de la Operación">
                 {selectedOperation && (
