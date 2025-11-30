@@ -8,6 +8,7 @@ import ReportesPage from './pages/ReportesPage';
 import VendedoresPage from './pages/VendedoresPage';
 import SucursalesPage from './pages/SucursalesPage';
 import UserManagementPage from './pages/UserManagementPage';
+import ConfiguracionPage from './pages/ConfiguracionPage';
 
 function App() {
     return (
@@ -26,32 +27,41 @@ function App() {
                     <Route
                         path="/reportes"
                         element={
-                        <ProtectedRoute>
-                            <ReportesPage />
-                        </ProtectedRoute>
+                            <ProtectedRoute allowedRoles={['ADMIN', 'MANAGER']}>
+                                <ReportesPage />
+                            </ProtectedRoute>
                         }
                     />
                     <Route
                         path="/vendedores"
                         element={
-                        <ProtectedRoute>
-                            <VendedoresPage />
-                        </ProtectedRoute>
+                            <ProtectedRoute allowedRoles={['ADMIN', 'MANAGER']}>
+                                <VendedoresPage />
+                            </ProtectedRoute>
                         }
                     />
                     <Route
                         path="/sucursales"
-                        element={<ProtectedRoute
-                        >
-                            <SucursalesPage />
-                        </ProtectedRoute>
+                        element={
+                            <ProtectedRoute allowedRoles={['ADMIN']}>
+                                <SucursalesPage />
+                            </ProtectedRoute>
                         }
                     />
                     <Route
                         path="/users"
-                        element={<ProtectedRoute>
-                            <UserManagementPage />
-                        </ProtectedRoute>
+                        element={
+                            <ProtectedRoute allowedRoles={['ADMIN']}>
+                                <UserManagementPage />
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path="/configuracion"
+                        element={
+                            <ProtectedRoute allowedRoles={['ADMIN']}>
+                                <ConfiguracionPage />
+                            </ProtectedRoute>
                         }
                     />
                 </Routes>

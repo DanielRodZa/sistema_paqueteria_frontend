@@ -14,7 +14,53 @@ apiClient.interceptors.request.use(config => {
         config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
-}, error=> {
+}, error => {
+    return Promise.reject(error);
+});
+
+apiClient.interceptors.response.use((response) => {
+    return response;
+}, async (error) => {
+    const originalRequest = error.config;
+
+    if (error.response && error.response.status === 401 && !originalRequest._retry) {
+        originalRequest._retry = true;
+        const authTokensString = localStorage.getItem('authTokens');
+
+        if (authTokensString) {
+            const authTokens = JSON.parse(authTokensString);
+            if (authTokens.refresh) {
+                try {
+                    const response = await axios.post('http://127.0.0.1:8000/api/token/refresh/', {
+                        refresh: authTokens.refresh
+                    });
+
+                    if (response.status === 200) {
+                        // Update tokens in localStorage
+                        authTokens.access = response.data.access;
+                        localStorage.setItem('authTokens', JSON.stringify(authTokens));
+
+                        // Update header for the original request
+                        apiClient.defaults.headers.common['Authorization'] = `Bearer ${response.data.access}`;
+                        originalRequest.headers['Authorization'] = `Bearer ${response.data.access}`;
+
+                        return apiClient(originalRequest);
+                    }
+                } catch (refreshError) {
+                    console.error("Token refresh failed:", refreshError);
+                    // Logout user if refresh fails
+                    localStorage.removeItem('authTokens');
+                    localStorage.removeItem('userData');
+                    window.location.href = '/'; // Redirect to login
+                }
+            }
+        }
+
+        // No refresh token available or refresh failed
+        localStorage.removeItem('authTokens');
+        localStorage.removeItem('userData');
+        window.location.href = '/';
+    }
     return Promise.reject(error);
 });
 

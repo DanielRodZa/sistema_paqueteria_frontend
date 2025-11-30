@@ -11,26 +11,52 @@ export const AuthProvider = ({ children }) => {
             ? JSON.parse(localStorage.getItem('authTokens'))
             : null
     );
-    const [user, setUser] = useState(() =>
-        localStorage.getItem('authTokens')
-            ? jwtDecode(JSON.parse(localStorage.getItem('authTokens')).access)
-            : null
-    );
+
+    // Initialize user from userData (preferred) or fallback to decoding token
+    const [user, setUser] = useState(() => {
+        if (localStorage.getItem('userData')) {
+            return JSON.parse(localStorage.getItem('userData'));
+        }
+        if (localStorage.getItem('authTokens')) {
+            try {
+                return jwtDecode(JSON.parse(localStorage.getItem('authTokens')).access);
+            } catch (e) {
+                return null;
+            }
+        }
+        return null;
+    });
 
     const login = async (username, password) => {
         try {
             const response = await apiClient.post('/token/', { username, password });
             const data = response.data;
+            console.log("LOGIN RESPONSE DATA:", data); // DEBUG LOG
             setTokens(data);
-            setUser(jwtDecode(data.access));
+
+            // Construct user object from response data + decoded token
+            // This ensures we have the role even if decoding fails or token is weird
+            let decoded = {};
+            try {
+                decoded = jwtDecode(data.access);
+            } catch (e) {
+                console.error("Token decode failed", e);
+            }
+
+            const userData = {
+                ...decoded,
+                username: data.username, // Explicitly from response
+                role: data.role          // Explicitly from response
+            };
+
+            setUser(userData);
             localStorage.setItem('authTokens', JSON.stringify(data));
-            // Return true or the user data on success
+            localStorage.setItem('userData', JSON.stringify(userData));
+
             return true;
         } catch (error) {
             console.error("Login failed:", error);
-            // Clear any stale data on failure
             logout();
-            // Propagate the error or return false so the UI can react
             throw error;
         }
     };
@@ -39,6 +65,7 @@ export const AuthProvider = ({ children }) => {
         setTokens(null);
         setUser(null);
         localStorage.removeItem('authTokens');
+        localStorage.removeItem('userData');
     };
 
     const contextData = {

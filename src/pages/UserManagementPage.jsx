@@ -67,48 +67,72 @@ function UserManagementPage() {
                     {!loading && !error && (
                         <table className="min-w-full divide-y divide-gray-200">
                             <thead className="bg-gray-50">
-                            <tr>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Usuario</th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nombre completo</th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Rol</th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Sucursal</th>
-                            </tr>
+                                <tr>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Usuario</th>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nombre completo</th>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Rol</th>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Sucursal</th>
+                                </tr>
                             </thead>
                             <tbody className="bg-white divide-y divide-gray-200">
-                            {users.map((user) => (
-                                <tr key={user.id}>
-                                    <td className="px-6 py-4 whitespace-nowrap font-medium">{user.username}</td>
-                                    <td className="px-6 py-4 whitespace-nowrap">{user.first_name} {user.last_name}</td>
-                                    <td className="px-6 py-4 whitespace-nowrap">
-                                        <select
-                                            value={user.role}
-                                            onChange={(e) => handleUserUpdate(user.id, 'role', e.target.value)}
-                                            disabled={user.role === 'ADMIN'} // Prevent changing other admins
-                                            className="p-1 border rounded-md disabled:bg-gray-200"
-                                        >
-                                            <option value="ADMIN">Admin</option>
-                                            <option value="MANAGER">Manager</option>
-                                            <option value="RECEPCIONISTA">Recepcionista</option>
-                                        </select>
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap">
-                                        {user.role !== 'ADMIN' ? (
+                                {users.map((user) => (
+                                    <tr key={user.id}>
+                                        <td className="px-6 py-4 whitespace-nowrap font-medium">
+                                            <input
+                                                type="text"
+                                                defaultValue={user.username}
+                                                onBlur={(e) => handleUserUpdate(user.id, 'username', e.target.value)}
+                                                className="border rounded p-1 w-full"
+                                            />
+                                        </td>
+                                        <td className="px-6 py-4 whitespace-nowrap">
+                                            <div className="flex space-x-2">
+                                                <input
+                                                    type="text"
+                                                    defaultValue={user.first_name}
+                                                    onBlur={(e) => handleUserUpdate(user.id, 'first_name', e.target.value)}
+                                                    className="border rounded p-1 w-24"
+                                                    placeholder="Nombre"
+                                                />
+                                                <input
+                                                    type="text"
+                                                    defaultValue={user.last_name}
+                                                    onBlur={(e) => handleUserUpdate(user.id, 'last_name', e.target.value)}
+                                                    className="border rounded p-1 w-24"
+                                                    placeholder="Apellido"
+                                                />
+                                            </div>
+                                        </td>
+                                        <td className="px-6 py-4 whitespace-nowrap">
                                             <select
-                                                value={user.sucursal || ''}
-                                                onChange={(e) => handleUserUpdate(user.id, 'sucursal', e.target.value)}
-                                                className="p-1 border rounded-md"
+                                                value={user.role}
+                                                onChange={(e) => handleUserUpdate(user.id, 'role', e.target.value)}
+                                                disabled={user.role === 'ADMIN'} // Prevent changing other admins
+                                                className="p-1 border rounded-md disabled:bg-gray-200"
                                             >
-                                                <option value="">Not Assigned</option>
-                                                {sucursales.map(s => (
-                                                    <option key={s.id} value={s.id}>{s.nombre}</option>
-                                                ))}
+                                                <option value="ADMIN">Admin</option>
+                                                <option value="MANAGER">Manager</option>
+                                                <option value="RECEPCIONISTA">Recepcionista</option>
                                             </select>
-                                        ) : (
-                                            <span className="text-gray-500">N/A</span>
-                                        )}
-                                    </td>
-                                </tr>
-                            ))}
+                                        </td>
+                                        <td className="px-6 py-4 whitespace-nowrap">
+                                            {user.role !== 'ADMIN' ? (
+                                                <select
+                                                    value={user.sucursal || ''}
+                                                    onChange={(e) => handleUserUpdate(user.id, 'sucursal', e.target.value)}
+                                                    className="p-1 border rounded-md"
+                                                >
+                                                    <option value="">Not Assigned</option>
+                                                    {sucursales.map(s => (
+                                                        <option key={s.id} value={s.id}>{s.nombre}</option>
+                                                    ))}
+                                                </select>
+                                            ) : (
+                                                <span className="text-gray-500">N/A</span>
+                                            )}
+                                        </td>
+                                    </tr>
+                                ))}
                             </tbody>
                         </table>
                     )}

@@ -15,7 +15,7 @@ const Ticket = React.forwardRef(({ operation, }, ref) => {
                 </div>
                 <h2 className="text-xl font-bold">Comprobante de Operación</h2>
                 <p className="text-xs text-gray-600 mt-1">{operation.sucursal_origen_nombre}</p>
-                 <p className="text-xs text-gray-500">{operation.sucursal_origen.direccion}</p>
+                <p className="text-xs text-gray-500">{operation.sucursal_origen.direccion}</p>
             </div>
 
             {/* --- 2. Folio y QR --- */}
@@ -32,6 +32,14 @@ const Ticket = React.forwardRef(({ operation, }, ref) => {
                 <div className="flex justify-between py-1"><span>Vendedor:</span> <span className="font-semibold">{operation.vendedor_nombre}</span></div>
                 <div className="flex justify-between py-1"><span>Comprador:</span> <span className="font-semibold">{operation.comprador}</span></div>
                 <div className="flex justify-between py-1"><span>Sucursal Destino:</span> <span className="font-semibold">{operation.sucursal_destino_nombre}</span></div>
+                <div className="flex justify-between py-1"><span>Tamaño:</span> <span className="font-semibold">{operation.tamano_paquete}</span></div>
+                {operation.peso && <div className="flex justify-between py-1"><span>Peso:</span> <span className="font-semibold">{operation.peso} kg</span></div>}
+                <div className="flex justify-between py-1">
+                    <span>Tipo Entrega:</span>
+                    <span className={`font-semibold ${operation.tipo_entrega === 'urgente' ? 'text-red-600 font-bold uppercase' : ''}`}>
+                        {operation.tipo_entrega}
+                    </span>
+                </div>
             </div>
 
             <div className="my-4 border-b border-dashed py-2 text-sm">
@@ -52,6 +60,7 @@ const Ticket = React.forwardRef(({ operation, }, ref) => {
                 {/* --- 5. Fechas --- */}
                 <p>Fecha de Expedición: {new Date(operation.fecha_creacion).toLocaleString()}</p>
                 <p>Fecha de Expiración: {operation.fecha_expiracion}</p>
+                {operation.recibido_por_nombre && <p className="mt-1">Atendido por: {operation.recibido_por_nombre}</p>}
                 <p className="mt-2 font-semibold">El comprador debe presentar este folio para recoger el paquete.</p>
             </div>
         </div>

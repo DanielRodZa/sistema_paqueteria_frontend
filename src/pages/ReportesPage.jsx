@@ -25,7 +25,7 @@ function ReportesPage() {
             setLoading(true);
             try {
                 const params = new URLSearchParams(filters);
-                const response = await apiClient.get(`/reportes/?${params.toString()}`);
+                const response = await apiClient.get(`/operaciones/reportes/?${params.toString()}`);
 
                 const chartData = response.data.conteo_por_estado.map(item => ({
                     name: statusMap[item.estado] || item.estado,
@@ -66,11 +66,11 @@ function ReportesPage() {
                 <div className="bg-white p-4 rounded-lg shadow mb-8 flex items-center space-x-4 no-print">
                     <div>
                         <label htmlFor="date_after" className="text-sm font-medium text-gray-700">Desde</label>
-                        <input type="date" name="date_after" value={filters.date_after} onChange={handleFilterChange} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2"/>
+                        <input type="date" name="date_after" value={filters.date_after} onChange={handleFilterChange} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2" />
                     </div>
                     <div>
                         <label htmlFor="date_before" className="text-sm font-medium text-gray-700">Hasta</label>
-                        <input type="date" name="date_before" value={filters.date_before} onChange={handleFilterChange} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2"/>
+                        <input type="date" name="date_before" value={filters.date_before} onChange={handleFilterChange} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2" />
                     </div>
                 </div>
 
@@ -109,22 +109,50 @@ function ReportesPage() {
                                 <h4 className="text-lg font-semibold text-gray-700 mb-2">Datos en Tabla</h4>
                                 <table className="min-w-full divide-y divide-gray-200">
                                     <thead className="bg-gray-50">
-                                    <tr>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Estado</th>
-                                        <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Cantidad</th>
-                                    </tr>
+                                        <tr>
+                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Estado</th>
+                                            <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Cantidad</th>
+                                        </tr>
                                     </thead>
                                     <tbody className="bg-white divide-y divide-gray-200">
-                                    {reportData.chartData.map((item) => (
-                                        <tr key={item.name}>
-                                            <td className="px-6 py-4 whitespace-nowrap font-medium text-gray-900">{item.name}</td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-right text-gray-700 font-bold">{item.cantidad}</td>
-                                        </tr>
-                                    ))}
+                                        {reportData.chartData.map((item) => (
+                                            <tr key={item.name}>
+                                                <td className="px-6 py-4 whitespace-nowrap font-medium text-gray-900">{item.name}</td>
+                                                <td className="px-6 py-4 whitespace-nowrap text-right text-gray-700 font-bold">{item.cantidad}</td>
+                                            </tr>
+                                        ))}
                                     </tbody>
                                 </table>
                             </div>
                         </div>
+
+                        {reportData.paquetes_expirados && reportData.paquetes_expirados.length > 0 && (
+                            <div className="p-6 rounded-lg shadow-sm border bg-red-50 border-red-200">
+                                <h3 className="text-xl font-bold text-red-800 mb-4">⚠️ Paquetes Expirados (Este Mes)</h3>
+                                <div className="overflow-x-auto">
+                                    <table className="min-w-full divide-y divide-red-200">
+                                        <thead className="bg-red-100">
+                                            <tr>
+                                                <th className="px-6 py-3 text-left text-xs font-medium text-red-800 uppercase">Folio</th>
+                                                <th className="px-6 py-3 text-left text-xs font-medium text-red-800 uppercase">Vendedor</th>
+                                                <th className="px-6 py-3 text-left text-xs font-medium text-red-800 uppercase">Fecha Expiración</th>
+                                                <th className="px-6 py-3 text-right text-xs font-medium text-red-800 uppercase">Costo Acumulado</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody className="bg-white divide-y divide-red-100">
+                                            {reportData.paquetes_expirados.map((op) => (
+                                                <tr key={op.folio}>
+                                                    <td className="px-6 py-4 whitespace-nowrap font-mono text-sm text-gray-900">{op.folio}</td>
+                                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{op.vendedor_nombre}</td>
+                                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-red-600 font-bold">{op.fecha_expiracion}</td>
+                                                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm text-gray-900">${parseFloat(op.costo).toFixed(2)}</td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        )}
                     </div>
                 )}
             </div>

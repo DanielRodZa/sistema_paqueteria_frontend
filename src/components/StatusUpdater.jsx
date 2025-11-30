@@ -5,6 +5,7 @@ import apiClient from '../services/api';
 const statusMap = {
     listo_para_entrega: 'Listo para entrega',
     en_resguardo: 'En resguardo',
+    en_transito: 'En Tránsito',
     entregado: 'Entregado',
     cancelado: 'Cancelado',
 };
