@@ -1,58 +1,63 @@
-import React, { useEffect, useRef } from 'react';
-import { Html5QrcodeScanner } from 'html5-qrcode';
+import React, { useEffect, useState } from 'react';
+import { Html5Qrcode } from 'html5-qrcode';
 
 function QrScanner({ onScanSuccess }) {
-    const scannerRef = useRef(null); // Use a ref to hold the scanner instance
+    const [error, setError] = useState(null);
 
     useEffect(() => {
-        // Ensure the logic runs only once when the component mounts
-        if (scannerRef.current) {
-            return;
-        }
+        const scannerId = "qr-reader";
+        const html5QrCode = new Html5Qrcode(scannerId);
 
-        // Create a new scanner instance
-        const scanner = new Html5QrcodeScanner(
-            "qr-reader", // ID of the div to render into
-            {
-                fps: 10,
-                qrbox: { width: 250, height: 250 },
-            },
-            true // verbose
-        );
-
-        // Define the success callback
-        const success = (decodedText) => {
-            // Ensure we have a scanner instance to clear
-            if (scannerRef.current) {
-                scanner.clear().catch(error => {
-                    console.error("Failed to clear scanner after success.", error);
-                });
-                onScanSuccess(decodedText);
+        const startScanner = async () => {
+            try {
+                await html5QrCode.start(
+                    { facingMode: "environment" },
+                    {
+                        fps: 10,
+                        qrbox: { width: 250, height: 250 },
+                    },
+                    (decodedText) => {
+                        // Success callback
+                        html5QrCode.stop().then(() => {
+                            html5QrCode.clear();
+                            onScanSuccess(decodedText);
+                        }).catch(err => {
+                            console.error("Failed to stop scanner", err);
+                            // Even if stop fails, try to proceed
+                            onScanSuccess(decodedText);
+                        });
+                    },
+                    (errorMessage) => {
+                        // Error callback (scanning issues)
+                        // console.log(errorMessage); // Optional: unexpected errors
+                    }
+                );
+            } catch (err) {
+                console.error("Error starting scanner:", err);
+                setError("No se pudo acceder a la cámara. Verifique los permisos.");
             }
         };
 
-        // Define the error callback (can be left empty)
-        const error = (err) => {
-            console.error(err);
-        };
+        startScanner();
 
-        // Start the scanner
-        scanner.render(success, error);
-
-        // Store the scanner instance in the ref
-        scannerRef.current = scanner;
-
-        // Define the cleanup function for when the component unmounts
         return () => {
-            if (scannerRef.current) {
-                scannerRef.current.clear().catch(error => {
-                    console.error("Failed to clear scanner on unmount.", error);
-                });
+            if (html5QrCode.isScanning) {
+                html5QrCode.stop().then(() => {
+                    html5QrCode.clear();
+                }).catch(err => console.error("Error stopping scanner on unmount", err));
+            } else {
+                html5QrCode.clear();
             }
         };
-    }, [onScanSuccess]); // The dependency array is correct
+    }, []); // Removed dependency to prevent re-initialization
 
-    return <div id="qr-reader" className="w-full"></div>;
+    return (
+        <div className="w-full flex flex-col items-center">
+            <div id="qr-reader" className="w-full max-w-sm"></div>
+            {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
+            <p className="text-xs text-gray-500 mt-2">Apunta la cámara al código QR del vendedor.</p>
+        </div>
+    );
 }
 
 export default QrScanner;

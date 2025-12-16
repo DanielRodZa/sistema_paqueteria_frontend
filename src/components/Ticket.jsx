@@ -11,7 +11,7 @@ const Ticket = React.forwardRef(({ operation, }, ref) => {
             {/* --- 1. Logo (Placeholder) y Dirección de Sucursal --- */}
             <div className="text-center mb-4">
                 <div className="h-16 w-32 mx-auto flex items-center justify-center text-gray-500 mb-8">
-                    <img src={logo} alt="Logo de la Empresa" className="h-32 w-auto mx-auto mb-2" />
+                    <img src={logo} alt="Logo de la Empresa" className="h-6 w-auto mx-auto mb-2" />
                 </div>
                 <h2 className="text-xl font-bold">Comprobante de Operación</h2>
                 <p className="text-xs text-gray-600 mt-1">{operation.sucursal_origen_nombre}</p>
@@ -33,7 +33,7 @@ const Ticket = React.forwardRef(({ operation, }, ref) => {
                 <div className="flex justify-between py-1"><span>Comprador:</span> <span className="font-semibold">{operation.comprador}</span></div>
                 <div className="flex justify-between py-1"><span>Sucursal Destino:</span> <span className="font-semibold">{operation.sucursal_destino_nombre}</span></div>
                 <div className="flex justify-between py-1"><span>Tamaño:</span> <span className="font-semibold">{operation.tamano_paquete}</span></div>
-                {operation.peso && <div className="flex justify-between py-1"><span>Peso:</span> <span className="font-semibold">{operation.peso} kg</span></div>}
+                <div className="flex justify-between py-1"><span>Tamaño:</span> <span className="font-semibold">{operation.tamano_paquete}</span></div>
                 <div className="flex justify-between py-1">
                     <span>Tipo Entrega:</span>
                     <span className={`font-semibold ${operation.tipo_entrega === 'urgente' ? 'text-red-600 font-bold uppercase' : ''}`}>

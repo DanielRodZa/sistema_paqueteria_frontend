@@ -4,7 +4,7 @@ import apiClient from '../services/api';
 function VendedorForm({ vendedor, onSuccess }) {
     // Inicializa el estado del formulario, usando los datos del vendedor si se está editando
     const [formData, setFormData] = useState({
-        id: vendedor?.id || '',
+        // id is read-only or auto-generated
         nombre: vendedor?.nombre || '',
         email: vendedor?.email || '',
         telefono: vendedor?.telefono || '',
@@ -14,10 +14,7 @@ function VendedorForm({ vendedor, onSuccess }) {
         const { name, value } = e.target;
         let finalValue = value;
 
-        // Convierte el código a mayúsculas mientras se escribe
-        if (name === 'id') {
-            finalValue = value.toUpperCase();
-        }
+
 
         setFormData(prev => ({ ...prev, [name]: finalValue }));
     };
@@ -43,21 +40,7 @@ function VendedorForm({ vendedor, onSuccess }) {
 
     return (
         <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-                <label htmlFor="id" className="block text-sm font-medium text-gray-700">Código de Vendedor (ej. JUANP)</label>
-                <input
-                    type="text"
-                    name="id"
-                    value={formData.id}
-                    onChange={handleChange}
-                    placeholder="Código único"
-                    maxLength="15"
-                    required
-                    // El campo de código se deshabilita si se está editando
-                    disabled={!!vendedor}
-                    className="w-full p-2 border rounded-md disabled:bg-gray-200"
-                />
-            </div>
+
 
             <div>
                 <label htmlFor="nombre" className="block text-sm font-medium text-gray-700">Nombre Completo</label>
@@ -74,11 +57,11 @@ function VendedorForm({ vendedor, onSuccess }) {
 
             <div>
                 <label htmlFor="email" className="block text-sm font-medium text-gray-700">Correo Electrónico</label>
-                <input type="email" name="email" value={formData.email} onChange={handleChange} placeholder="Email del vendedor" className="w-full p-2 border rounded"/>
+                <input type="email" name="email" value={formData.email} onChange={handleChange} placeholder="Email del vendedor" className="w-full p-2 border rounded" />
             </div>
             <div>
                 <label htmlFor="telefono" className="block text-sm font-medium text-gray-700">Teléfono</label>
-                <input type="tel" name="telefono" value={formData.telefono} onChange={handleChange} placeholder="Teléfono de contacto" className="w-full p-2 border rounded"/>
+                <input type="tel" name="telefono" value={formData.telefono} onChange={handleChange} placeholder="Teléfono de contacto" className="w-full p-2 border rounded" />
             </div>
 
             <button type="submit" className="w-full mt-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-md">

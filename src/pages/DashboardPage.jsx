@@ -217,15 +217,15 @@ function DashboardPage() {
             <div className="bg-gray-100 min-h-screen">
                 <header className="bg-white shadow-sm no-print">
                     <div className="max-w-[95%] mx-auto py-4 px-4 sm:px-6 lg:px-8 flex justify-between items-center">
-                        <img src={logo} alt="Logo" className="h-12 w-auto mr-4" />
+                        <img src={logo} alt="Logo" className="h-20 w-auto mr-4" />
                         <div>
                             <h1 className="text-2xl font-bold leading-tight text-gray-900">Dashboard</h1>
                             {user && (
-                                <div className="text-sm text-gray-500">
-                                    Usuario: {user.username} ({user.role})
-                                    <br />
-                                    <span className="text-xs text-red-500 bg-yellow-100 p-1 rounded">
-                                        DEBUG ROLE: '{user.role}' (Type: {typeof user.role})
+                                <div className="text-sm text-gray-500 flex items-center gap-2">
+                                    <span>Usuario: {user.username} ({user.role})</span>
+                                    {/* Debug indicator - subtle */}
+                                    <span title={`Role Debug: ${user.role} (${typeof user.role})`} className="cursor-help text-xs text-gray-400 opacity-50 hover:opacity-100">
+                                        ℹ️
                                     </span>
                                 </div>
                             )}

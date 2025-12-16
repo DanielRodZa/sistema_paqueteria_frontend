@@ -3,12 +3,16 @@ import { Link } from "react-router-dom";
 import apiClient from "../services/api.js";
 import { useAuth } from "../context/AuthContext.jsx";
 
+import Modal from "../components/Modal";
+import RecepcionistaForm from "../components/RecepcionistaForm";
+
 function UserManagementPage() {
     const { user: currentUser } = useAuth();
     const [users, setUsers] = useState([]);
     const [sucursales, setSucursales] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [isAddUserModalOpen, setIsAddUserModalOpen] = useState(false);
 
     const fetchData = useCallback(async () => {
         setLoading(true);
@@ -42,6 +46,18 @@ function UserManagementPage() {
         }
     };
 
+    const handleDeleteUser = async (userId) => {
+        if (window.confirm("¿Estás seguro de que deseas eliminar este usuario? Esta acción no se puede deshacer (soft delete).")) {
+            try {
+                await apiClient.delete(`/users/${userId}/`);
+                fetchData(); // Refresh list to see the user gone
+            } catch (error) {
+                alert("Error al eliminar usuario.");
+                console.error(error);
+            }
+        }
+    };
+
     if (currentUser?.role !== 'ADMIN') {
         return (
             <div className="p-8 text-center text-red-500">
@@ -56,9 +72,17 @@ function UserManagementPage() {
             <div className="max-w-7xl mx-auto">
                 <div className="mb-6 flex justify-between items-center">
                     <h1 className="text-3xl font-bold text-gray-800">Administración de usuarios</h1>
-                    <Link to="/" className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded">
-                        Regresar al Dashboard
-                    </Link>
+                    <div className="space-x-4">
+                        <button
+                            onClick={() => setIsAddUserModalOpen(true)}
+                            className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
+                        >
+                            + Crear Nuevo Usuario
+                        </button>
+                        <Link to="/" className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded">
+                            Regresar al Dashboard
+                        </Link>
+                    </div>
                 </div>
 
                 <div className="bg-white p-6 rounded-lg shadow overflow-x-auto">
@@ -72,6 +96,7 @@ function UserManagementPage() {
                                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nombre completo</th>
                                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Rol</th>
                                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Sucursal</th>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Acciones</th>
                                 </tr>
                             </thead>
                             <tbody className="bg-white divide-y divide-gray-200">
@@ -83,6 +108,8 @@ function UserManagementPage() {
                                                 defaultValue={user.username}
                                                 onBlur={(e) => handleUserUpdate(user.id, 'username', e.target.value)}
                                                 className="border rounded p-1 w-full"
+                                                readOnly // Username should ideally be read-only if generated
+                                                disabled
                                             />
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap">
@@ -131,6 +158,17 @@ function UserManagementPage() {
                                                 <span className="text-gray-500">N/A</span>
                                             )}
                                         </td>
+                                        <td className="px-6 py-4 whitespace-nowrap">
+                                            {user.role !== 'ADMIN' && (
+                                                <button
+                                                    onClick={() => handleDeleteUser(user.id)}
+                                                    className="text-red-600 hover:text-red-900 font-bold"
+                                                    title="Eliminar usuario"
+                                                >
+                                                    Eliminar
+                                                </button>
+                                            )}
+                                        </td>
                                     </tr>
                                 ))}
                             </tbody>
@@ -138,6 +176,18 @@ function UserManagementPage() {
                     )}
                 </div>
             </div>
+
+            <Modal isOpen={isAddUserModalOpen} onClose={() => setIsAddUserModalOpen(false)} title="Crear Nuevo Usuario">
+                <RecepcionistaForm onSuccess={(data) => {
+                    setIsAddUserModalOpen(false);
+                    fetchData();
+                    if (data && data.username) {
+                        alert(`Usuario creado exitosamente.\n\nNombre de Usuario: ${data.username}\n\nPor favor, copie este nombre de usuario.`);
+                    } else {
+                        alert("Usuario creado exitosamente.");
+                    }
+                }} />
+            </Modal>
         </div>
     );
 }

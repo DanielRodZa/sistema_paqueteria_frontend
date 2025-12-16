@@ -133,12 +133,18 @@ function NewOperationForm({ onSuccess }) {
             return;
         }
         setIsSubmitting(true);
+        if (!formData.sucursal_origen || !formData.sucursal_destino) {
+            alert("Selecciona las sucursales de origen y destino.");
+            setIsSubmitting(false);
+            return;
+        }
+
         try {
             const payload = {
                 vendedor: foundVendedor.id,
                 comprador: formData.comprador,
                 tamano_paquete: formData.tamano,
-                peso: formData.peso,
+                peso: formData.peso || 0, // Fallback to 0 if empty
                 tipo_entrega: formData.tipo_entrega,
                 sucursal_origen: formData.sucursal_origen,
                 sucursal_destino: formData.sucursal_destino,
