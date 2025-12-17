@@ -306,7 +306,31 @@ function DashboardPage() {
                                 <input type="date" name="end_date" value={filters.end_date} onChange={handleFilterChange} className="mt-1 block w-full rounded-md p-2 border-gray-300 shadow-sm" />
                             </div>
                             <div>
-                                <button onClick={clearFilters} className="w-full bg-gray-200 hover:bg-gray-300 font-semibold py-2 px-4 rounded-md shadow-sm">Limpiar</button>
+                                <button onClick={clearFilters} className="w-full bg-gray-200 hover:bg-gray-300 font-semibold py-2 px-4 rounded-md shadow-sm mb-2">Limpiar</button>
+                                <button
+                                    onClick={async () => {
+                                        try {
+                                            const params = new URLSearchParams();
+                                            Object.entries(debouncedFilters).forEach(([key, value]) => {
+                                                if (value) params.append(key, value);
+                                            });
+                                            const response = await apiClient.get('/operaciones/export/', { params, responseType: 'blob' });
+                                            const url = window.URL.createObjectURL(new Blob([response.data]));
+                                            const link = document.createElement('a');
+                                            link.href = url;
+                                            link.setAttribute('download', 'reporte_operaciones.csv');
+                                            document.body.appendChild(link);
+                                            link.click();
+                                            link.remove();
+                                        } catch (error) {
+                                            console.error("Error exporting", error);
+                                            alert("Error al exportar");
+                                        }
+                                    }}
+                                    className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-md shadow-sm"
+                                >
+                                    Exportar CSV
+                                </button>
                             </div>
                         </div>
                     </div>

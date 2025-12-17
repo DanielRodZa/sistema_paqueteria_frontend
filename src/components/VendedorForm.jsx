@@ -13,9 +13,9 @@ function VendedorForm({ vendedor, onSuccess }) {
     const handleChange = (e) => {
         const { name, value } = e.target;
         let finalValue = value;
-
-
-
+        if (name === 'nombre') {
+            finalValue = value.toUpperCase();
+        }
         setFormData(prev => ({ ...prev, [name]: finalValue }));
     };
 

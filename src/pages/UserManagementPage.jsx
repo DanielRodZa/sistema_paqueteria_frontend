@@ -36,12 +36,24 @@ function UserManagementPage() {
         fetchData();
     }, [fetchData]);
 
-    const handleUserUpdate = async (userId, field, value) => {
+    const handleLocalChange = (userId, field, value) => {
+        setUsers(prevUsers => prevUsers.map(u =>
+            u.id === userId ? { ...u, [field]: value } : u
+        ));
+    };
+
+    const handleSaveUser = async (user) => {
         try {
-            await apiClient.patch(`/users/${userId}/`, { [field]: value });
-            fetchData();
+            await apiClient.patch(`/users/${user.id}/`, {
+                first_name: user.first_name,
+                last_name: user.last_name,
+                role: user.role,
+                sucursal: user.sucursal
+            });
+            alert("Usuario actualizado correctamente.");
+            fetchData(); // Optional: refresh to be sure
         } catch (error) {
-            alert("Fallo al actualizar el ususario.");
+            alert("Fallo al actualizar el usuario.");
             console.error(error);
         }
     };
@@ -105,26 +117,25 @@ function UserManagementPage() {
                                         <td className="px-6 py-4 whitespace-nowrap font-medium">
                                             <input
                                                 type="text"
-                                                defaultValue={user.username}
-                                                onBlur={(e) => handleUserUpdate(user.id, 'username', e.target.value)}
-                                                className="border rounded p-1 w-full"
-                                                readOnly // Username should ideally be read-only if generated
+                                                value={user.username}
+                                                readOnly
                                                 disabled
+                                                className="border rounded p-1 w-full bg-gray-100 text-gray-500 cursor-not-allowed"
                                             />
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap">
                                             <div className="flex space-x-2">
                                                 <input
                                                     type="text"
-                                                    defaultValue={user.first_name}
-                                                    onBlur={(e) => handleUserUpdate(user.id, 'first_name', e.target.value)}
+                                                    value={user.first_name}
+                                                    onChange={(e) => handleLocalChange(user.id, 'first_name', e.target.value)}
                                                     className="border rounded p-1 w-24"
                                                     placeholder="Nombre"
                                                 />
                                                 <input
                                                     type="text"
-                                                    defaultValue={user.last_name}
-                                                    onBlur={(e) => handleUserUpdate(user.id, 'last_name', e.target.value)}
+                                                    value={user.last_name}
+                                                    onChange={(e) => handleLocalChange(user.id, 'last_name', e.target.value)}
                                                     className="border rounded p-1 w-24"
                                                     placeholder="Apellido"
                                                 />
@@ -133,8 +144,8 @@ function UserManagementPage() {
                                         <td className="px-6 py-4 whitespace-nowrap">
                                             <select
                                                 value={user.role}
-                                                onChange={(e) => handleUserUpdate(user.id, 'role', e.target.value)}
-                                                disabled={user.role === 'ADMIN'} // Prevent changing other admins
+                                                onChange={(e) => handleLocalChange(user.id, 'role', e.target.value)}
+                                                disabled={user.role === 'ADMIN'}
                                                 className="p-1 border rounded-md disabled:bg-gray-200"
                                             >
                                                 <option value="ADMIN">Admin</option>
@@ -146,7 +157,7 @@ function UserManagementPage() {
                                             {user.role !== 'ADMIN' ? (
                                                 <select
                                                     value={user.sucursal || ''}
-                                                    onChange={(e) => handleUserUpdate(user.id, 'sucursal', e.target.value)}
+                                                    onChange={(e) => handleLocalChange(user.id, 'sucursal', e.target.value)}
                                                     className="p-1 border rounded-md"
                                                 >
                                                     <option value="">Not Assigned</option>
@@ -158,15 +169,24 @@ function UserManagementPage() {
                                                 <span className="text-gray-500">N/A</span>
                                             )}
                                         </td>
-                                        <td className="px-6 py-4 whitespace-nowrap">
+                                        <td className="px-6 py-4 whitespace-nowrap space-x-2">
                                             {user.role !== 'ADMIN' && (
-                                                <button
-                                                    onClick={() => handleDeleteUser(user.id)}
-                                                    className="text-red-600 hover:text-red-900 font-bold"
-                                                    title="Eliminar usuario"
-                                                >
-                                                    Eliminar
-                                                </button>
+                                                <>
+                                                    <button
+                                                        onClick={() => handleSaveUser(user)}
+                                                        className="text-blue-600 hover:text-blue-900 font-bold"
+                                                        title="Guardar cambios"
+                                                    >
+                                                        Guardar
+                                                    </button>
+                                                    <button
+                                                        onClick={() => handleDeleteUser(user.id)}
+                                                        className="text-red-600 hover:text-red-900 font-bold"
+                                                        title="Eliminar usuario"
+                                                    >
+                                                        Eliminar
+                                                    </button>
+                                                </>
                                             )}
                                         </td>
                                     </tr>

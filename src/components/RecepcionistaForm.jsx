@@ -39,7 +39,11 @@ function RecepcionistaForm({ onSuccess }) {
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setFormData(prev => ({ ...prev, [name]: value }));
+        let finalValue = value;
+        if (name === 'first_name' || name === 'last_name') {
+            finalValue = value.toUpperCase();
+        }
+        setFormData(prev => ({ ...prev, [name]: finalValue }));
     };
 
     const handleSubmit = async (e) => {

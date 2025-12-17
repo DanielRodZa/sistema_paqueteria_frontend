@@ -123,7 +123,11 @@ function NewOperationForm({ onSuccess }) {
 
     const handleChange = (e) => {
         const { name, value, type, checked } = e.target;
-        setFormData(prev => ({ ...prev, [name]: type === 'checkbox' ? checked : value }));
+        let finalValue = type === 'checkbox' ? checked : value;
+        if (name === 'comprador') {
+            finalValue = value.toUpperCase();
+        }
+        setFormData(prev => ({ ...prev, [name]: finalValue }));
     };
 
     const handleSubmit = async (e) => {

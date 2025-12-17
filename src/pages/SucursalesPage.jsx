@@ -18,7 +18,7 @@ const SucursalForm = ({ sucursal, onSuccess }) => {
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setFormData(prev => ({ ...prev, [name]: value }));
+        setFormData(prev => ({ ...prev, [name]: name === 'nombre' ? value.toUpperCase() : value }));
     };
 
     const handleSubmit = async (e) => {
@@ -56,23 +56,23 @@ const SucursalForm = ({ sucursal, onSuccess }) => {
             </div>
             <div>
                 <label htmlFor="nombre" className="block text-sm font-medium text-gray-700">Nombre</label>
-                <input type="text" name="nombre" value={formData.nombre} onChange={handleChange} placeholder="Nombre de la sucursal" required className="w-full p-2 border rounded"/>
+                <input type="text" name="nombre" value={formData.nombre} onChange={handleChange} placeholder="Nombre de la sucursal" required className="w-full p-2 border rounded" />
             </div>
             <div>
                 <label htmlFor="direccion" className="block text-sm font-medium text-gray-700">Dirección</label>
-                <textarea name="direccion" value={formData.direccion} onChange={handleChange} placeholder="Dirección" required className="w-full p-2 border rounded"/>
+                <textarea name="direccion" value={formData.direccion} onChange={handleChange} placeholder="Dirección" required className="w-full p-2 border rounded" />
             </div>
             <div>
                 <label htmlFor="telefono" className="block text-sm font-medium text-gray-700">Teléfono</label>
-                <input type="text" name="telefono" value={formData.telefono} onChange={handleChange} placeholder="Teléfono (Opcional)" className="w-full p-2 border rounded"/>
+                <input type="text" name="telefono" value={formData.telefono} onChange={handleChange} placeholder="Teléfono (Opcional)" className="w-full p-2 border rounded" />
             </div>
             <div>
                 <label htmlFor="email_contacto" className="block text-sm font-medium text-gray-700">Email de Contacto</label>
-                <input type="email" name="email_contacto" value={formData.email_contacto} onChange={handleChange} placeholder="Email de la sucursal" className="w-full p-2 border rounded"/>
+                <input type="email" name="email_contacto" value={formData.email_contacto} onChange={handleChange} placeholder="Email de la sucursal" className="w-full p-2 border rounded" />
             </div>
             <div>
                 <label htmlFor="horario" className="block text-sm font-medium text-gray-700">Horario</label>
-                <input type="text" name="horario" value={formData.horario} onChange={handleChange} placeholder="Ej. L-V 9am - 6pm" className="w-full p-2 border rounded"/>
+                <input type="text" name="horario" value={formData.horario} onChange={handleChange} placeholder="Ej. L-V 9am - 6pm" className="w-full p-2 border rounded" />
             </div>
             <button type="submit" className="w-full mt-4 bg-indigo-600 text-white p-2 rounded">Guardar</button>
         </form>
@@ -138,27 +138,27 @@ function SucursalesPage() {
                     {loading ? <p>Cargando...</p> : (
                         <table className="min-w-full divide-y divide-gray-200">
                             <thead className="bg-gray-50">
-                            <tr>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nombre</th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Dirección</th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Email</th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Horario</th>
-                                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Acciones</th>
-                            </tr>
+                                <tr>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nombre</th>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Dirección</th>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Email</th>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Horario</th>
+                                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Acciones</th>
+                                </tr>
                             </thead>
                             <tbody className="bg-white divide-y divide-gray-200">
-                            {sucursales.map(s => (
-                                <tr key={s.id}>
-                                    <td className="px-6 py-4 whitespace-nowrap">{s.nombre}</td>
-                                    <td className="px-6 py-4 whitespace-nowrap">{s.direccion}</td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{s.email_contacto || '-'}</td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{s.horario || '-'}</td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                        <button onClick={() => { setSelectedSucursal(s); setIsModalOpen(true); }} className="text-indigo-600 hover:text-indigo-900">Editar</button>
-                                        <button onClick={() => handleDelete(s.id)} className="text-red-600 hover:text-red-900 ml-4">Eliminar</button>
-                                    </td>
-                                </tr>
-                            ))}
+                                {sucursales.map(s => (
+                                    <tr key={s.id}>
+                                        <td className="px-6 py-4 whitespace-nowrap">{s.nombre}</td>
+                                        <td className="px-6 py-4 whitespace-nowrap">{s.direccion}</td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{s.email_contacto || '-'}</td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{s.horario || '-'}</td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                            <button onClick={() => { setSelectedSucursal(s); setIsModalOpen(true); }} className="text-indigo-600 hover:text-indigo-900">Editar</button>
+                                            <button onClick={() => handleDelete(s.id)} className="text-red-600 hover:text-red-900 ml-4">Eliminar</button>
+                                        </td>
+                                    </tr>
+                                ))}
                             </tbody>
                         </table>
                     )}

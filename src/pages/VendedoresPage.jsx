@@ -73,28 +73,28 @@ function VendedoresPage() {
                 <div className="bg-white p-6 rounded-lg shadow">
                     <table className="min-w-full divide-y divide-gray-200">
                         <thead className="bg-gray-50">
-                        <tr>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Código</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nombre</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Email</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Teléfono</th>
-                            <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Acciones</th>
-                        </tr>
+                            <tr>
+                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Código</th>
+                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nombre</th>
+                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Email</th>
+                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Teléfono</th>
+                                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Acciones</th>
+                            </tr>
                         </thead>
                         <tbody className="bg-white divide-y divide-gray-200">
-                        {vendedores.map(v => (
-                            <tr key={v.id}>
-                                <td className="px-6 py-4 whitespace-nowrap font-mono text-sm">{v.id}</td>
-                                <td className="px-6 py-4 whitespace-nowrap">{v.nombre}</td>
-                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{v.email || '-'}</td>
-                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{v.telefono || '-'}</td>
-                                <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                    <button onClick={() => { setSelectedVendedor(v); setIsQrOpen(true); }} className="text-blue-600 hover:text-blue-900">Mostrar QR</button>
-                                    <button onClick={() => { setSelectedVendedor(v); setIsFormOpen(true); }} className="text-indigo-600 hover:text-indigo-900 ml-4">Editar</button>
-                                    <button onClick={() => handleDelete(v.id)} className="text-red-600 hover:text-red-900 ml-4">Eliminar</button>
-                                </td>
-                            </tr>
-                        ))}
+                            {vendedores.map(v => (
+                                <tr key={v.id}>
+                                    <td className="px-6 py-4 whitespace-nowrap font-mono text-sm">{v.id}</td>
+                                    <td className="px-6 py-4 whitespace-nowrap">{v.nombre}</td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{v.email || '-'}</td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{v.telefono || '-'}</td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                        <button onClick={() => { setSelectedVendedor(v); setIsQrOpen(true); }} className="text-blue-600 hover:text-blue-900">Mostrar QR</button>
+                                        <button onClick={() => { setSelectedVendedor(v); setIsFormOpen(true); }} className="text-indigo-600 hover:text-indigo-900 ml-4">Editar</button>
+                                        <button onClick={() => handleDelete(v.id)} className="text-red-600 hover:text-red-900 ml-4">Eliminar</button>
+                                    </td>
+                                </tr>
+                            ))}
                         </tbody>
                     </table>
                 </div>
@@ -105,7 +105,38 @@ function VendedoresPage() {
             </Modal>
 
             <Modal isOpen={isQrOpen} onClose={() => setIsQrOpen(false)} title={`QR de ${selectedVendedor?.nombre}`}>
-                {selectedVendedor && <div className="p-4 flex justify-center"><QRCode value={selectedVendedor.id} size={256} /></div>}
+                {selectedVendedor && (
+                    <div className="flex flex-col items-center">
+                        <div id="qr-code-container" className="p-4 bg-white">
+                            <QRCode value={selectedVendedor.id} size={256} />
+                        </div>
+                        <button
+                            onClick={() => {
+                                const svg = document.querySelector('#qr-code-container svg');
+                                const canvas = document.createElement("canvas");
+                                const svgData = new XMLSerializer().serializeToString(svg);
+                                const img = new Image();
+                                img.onload = () => {
+                                    canvas.width = svg.clientWidth + 40; // Add padding margin
+                                    canvas.height = svg.clientHeight + 40;
+                                    const ctx = canvas.getContext("2d");
+                                    ctx.fillStyle = "white";
+                                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                                    ctx.drawImage(img, 20, 20); // Draw with padding
+                                    const pngFile = canvas.toDataURL("image/png");
+                                    const downloadLink = document.createElement("a");
+                                    downloadLink.download = `QR_${selectedVendedor.nombre.replace(/\s+/g, '_')}.png`;
+                                    downloadLink.href = pngFile;
+                                    downloadLink.click();
+                                };
+                                img.src = "data:image/svg+xml;base64," + btoa(svgData);
+                            }}
+                            className="mt-4 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+                        >
+                            Descargar Imagen
+                        </button>
+                    </div>
+                )}
             </Modal>
         </div>
     );

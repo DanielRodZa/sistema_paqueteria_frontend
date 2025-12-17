@@ -72,6 +72,13 @@ function ReportesPage() {
                         <label htmlFor="date_before" className="text-sm font-medium text-gray-700">Hasta</label>
                         <input type="date" name="date_before" value={filters.date_before} onChange={handleFilterChange} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2" />
                     </div>
+                    <div>
+                        <label htmlFor="vendedor" className="text-sm font-medium text-gray-700">Vendedor</label>
+                        <input type="text" name="vendedor" value={filters.vendedor || ''} onChange={(e) => {
+                            // Manual uppercase for better UX, though backend handles it
+                            handleFilterChange({ target: { name: 'vendedor', value: e.target.value.toUpperCase() } })
+                        }} placeholder="Nombre..." className="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2" />
+                    </div>
                 </div>
 
                 {loading && <p className="text-center p-10 no-print">Cargando reporte...</p>}
