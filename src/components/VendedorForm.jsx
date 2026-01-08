@@ -56,12 +56,12 @@ function VendedorForm({ vendedor, onSuccess }) {
             </div>
 
             <div>
-                <label htmlFor="email" className="block text-sm font-medium text-gray-700">Correo Electrónico</label>
+                <label htmlFor="email" className="block text-sm font-medium text-gray-700">Correo Electrónico (Opcional)</label>
                 <input type="email" name="email" value={formData.email} onChange={handleChange} placeholder="Email del vendedor" className="w-full p-2 border rounded" />
             </div>
             <div>
                 <label htmlFor="telefono" className="block text-sm font-medium text-gray-700">Teléfono</label>
-                <input type="tel" name="telefono" value={formData.telefono} onChange={handleChange} placeholder="Teléfono de contacto" className="w-full p-2 border rounded" />
+                <input type="tel" name="telefono" value={formData.telefono} onChange={handleChange} placeholder="Teléfono de contacto" required className="w-full p-2 border rounded" />
             </div>
 
             <button type="submit" className="w-full mt-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-md">

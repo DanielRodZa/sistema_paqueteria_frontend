@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useAuth } from '../context/AuthContext';
 import apiClient from '../services/api';
 import Ticket from "./Ticket";
 import Modal from "./Modal";
@@ -7,12 +8,12 @@ import QrScanner from "./QrScanner";
 
 
 function NewOperationForm({ onSuccess }) {
+    const { user } = useAuth();
     const [sucursales, setSucursales] = useState([]);
     const [configuracion, setConfiguracion] = useState(null);
     const [formData, setFormData] = useState({
         comprador: '',
-        tamano: 'CH',
-        peso: '',
+        tamano: 'STD',
         tipo_entrega: 'normal',
         sucursal_origen: '',
         sucursal_destino: '',
@@ -21,6 +22,7 @@ function NewOperationForm({ onSuccess }) {
 
     // Estados para la lógica del Vendedor
     const [vendedorSearchId, setVendedorSearchId] = useState('');
+    const [searchResults, setSearchResults] = useState([]); // For search results
     const [foundVendedor, setFoundVendedor] = useState(null);
     const [searchError, setSearchError] = useState(null);
     const [isVendedorModalOpen, setIsVendedorModalOpen] = useState(false);
@@ -40,7 +42,7 @@ function NewOperationForm({ onSuccess }) {
                 if (response.data.length > 0) {
                     setFormData(prev => ({
                         ...prev,
-                        sucursal_origen: response.data[0].id,
+                        sucursal_origen: user?.sucursal || response.data[0].id,
                         sucursal_destino: response.data[0].id,
                     }));
                 }
@@ -94,17 +96,48 @@ function NewOperationForm({ onSuccess }) {
         }
     }, [formData.sucursal_origen, formData.sucursal_destino, formData.tamano, formData.tipo_entrega, configuracion]);
 
-    const handleVendedorSearch = async (idToSearch) => {
-        const id = idToSearch || vendedorSearchId;
-        if (!id) return;
+    const handleVendedorSearch = async (termToSearch) => {
+        const term = termToSearch || vendedorSearchId;
+        if (!term) return;
+
+        // If it looks like an ID (starts with VR, length 6), try direct ID fetch first
+        if (term.toUpperCase().startsWith('VR') && term.length === 6) {
+            try {
+                const response = await apiClient.get(`/vendedores/${term.toUpperCase()}/`);
+                setFoundVendedor(response.data);
+                setVendedorSearchId(term.toUpperCase());
+                setSearchError(false);
+                setShowScanner(false);
+                setSearchResults([]); // Clear list if found directly
+                return;
+            } catch (error) {
+                // If not found by ID, fall through to text search (unlikely but safe)
+                // console.log("Not found by ID, trying general search");
+            }
+        }
+
+        // Search by name or ID using the list endpoint
         try {
-            const response = await apiClient.get(`/vendedores/${id.toUpperCase()}/`);
-            setFoundVendedor(response.data);
-            setVendedorSearchId(id.toUpperCase());
-            setSearchError(false);
-            setShowScanner(false);
+            const response = await apiClient.get(`/vendedores/?search=${term}`);
+            if (response.data && response.data.length > 0) {
+                if (response.data.length === 1) {
+                    setFoundVendedor(response.data[0]);
+                    setVendedorSearchId(response.data[0].id);
+                    setSearchResults([]);
+                } else {
+                    setSearchResults(response.data);
+                    setFoundVendedor(null); // Explicitly unset until user chooses
+                }
+                setSearchError(false);
+                setShowScanner(false);
+            } else {
+                setFoundVendedor(null);
+                setSearchResults([]);
+                setSearchError(true);
+            }
         } catch (error) {
             setFoundVendedor(null);
+            setSearchResults([]);
             setSearchError(true);
             console.log(error);
         }
@@ -148,7 +181,7 @@ function NewOperationForm({ onSuccess }) {
                 vendedor: foundVendedor.id,
                 comprador: formData.comprador,
                 tamano_paquete: formData.tamano,
-                peso: formData.peso || 0, // Fallback to 0 if empty
+                peso: 0, // Hardcoded to 0 as field is removed
                 tipo_entrega: formData.tipo_entrega,
                 sucursal_origen: formData.sucursal_origen,
                 sucursal_destino: formData.sucursal_destino,
@@ -193,14 +226,15 @@ function NewOperationForm({ onSuccess }) {
                 {submitError && <p className="text-red-500 text-sm">{submitError}</p>}
 
                 <div>
-                    <label htmlFor="vendedorSearchId" className="block text-sm font-medium text-gray-700">Código del Vendedor</label>
+                    <label htmlFor="vendedorSearchId" className="block text-sm font-medium text-gray-700">Código o Nombre del Vendedor</label>
                     <div className="flex items-center space-x-2 mt-1">
                         <input
                             type="text"
                             id="vendedorSearchId"
                             value={vendedorSearchId}
                             onChange={(e) => { setVendedorSearchId(e.target.value.toUpperCase()); setFoundVendedor(null); setSearchError(false); }}
-                            placeholder="Introduce el código y busca"
+                            onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), handleVendedorSearch())}
+                            placeholder="Introduce código (VRxxxx) o nombre"
                             className="block w-full px-3 py-2 border rounded-md"
                             disabled={!!foundVendedor}
                         />
@@ -210,9 +244,23 @@ function NewOperationForm({ onSuccess }) {
                                 <button type="button" onClick={() => setShowScanner(true)} className="bg-gray-700 text-white p-2 rounded-md">📷 QR</button>
                             </>
                         ) : (
-                            <button type="button" onClick={() => { setFoundVendedor(null); setVendedorSearchId(''); }} className="bg-gray-500 text-white p-2 rounded-md">Cambiar</button>
+                            <button type="button" onClick={() => { setFoundVendedor(null); setVendedorSearchId(''); setSearchResults([]); }} className="bg-gray-500 text-white p-2 rounded-md">Cambiar</button>
                         )}
                     </div>
+                    {/* Search Results Dropdown */}
+                    {searchResults.length > 1 && !foundVendedor && (
+                        <div className="mt-2 border rounded-md max-h-40 overflow-y-auto bg-white shadow-lg">
+                            {searchResults.map(v => (
+                                <div
+                                    key={v.id}
+                                    onClick={() => { setFoundVendedor(v); setVendedorSearchId(v.id); setSearchResults([]); }}
+                                    className="p-2 hover:bg-indigo-100 cursor-pointer border-b"
+                                >
+                                    <span className="font-bold">{v.id}</span> - {v.nombre}
+                                </div>
+                            ))}
+                        </div>
+                    )}
 
                     {foundVendedor && (
                         <div>
@@ -256,27 +304,13 @@ function NewOperationForm({ onSuccess }) {
                     </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 gap-4">
                     <div>
                         <label htmlFor="tamano" className="block text-sm font-medium text-gray-700">Tamaño</label>
                         <select id="tamano" name="tamano" value={formData.tamano} onChange={handleChange} className="mt-1 block w-full px-3 py-2 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-                            <option value="CH">Chico</option>
-                            <option value="M">Mediano</option>
-                            <option value="G">Grande</option>
+                            <option value="STD">Estándar</option>
                             <option value="XL">Extra Largo</option>
                         </select>
-                    </div>
-                    <div>
-                        <label htmlFor="peso" className="block text-sm font-medium text-gray-700">Peso (kg)</label>
-                        <input
-                            type="number"
-                            id="peso"
-                            name="peso"
-                            value={formData.peso}
-                            onChange={handleChange}
-                            step="0.01"
-                            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                        />
                     </div>
                 </div>
 

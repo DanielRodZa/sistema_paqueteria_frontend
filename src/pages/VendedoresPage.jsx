@@ -30,7 +30,7 @@ function VendedoresPage() {
     }, []);
 
     useEffect(() => {
-        if (user?.role === 'ADMIN') {
+        if (['ADMIN', 'MANAGER', 'RECEPCIONISTA'].includes(user?.role)) {
             fetchVendedores();
         }
     }, [fetchVendedores, user]);
@@ -46,7 +46,7 @@ function VendedoresPage() {
         }
     };
 
-    if (!['ADMIN', 'MANAGER'].includes(user?.role)) {
+    if (!['ADMIN', 'MANAGER', 'RECEPCIONISTA'].includes(user?.role)) {
         return (
             <div className="p-8 text-center text-red-500">
                 <p>Acceso denegado. Esta sección es para administradores y managers.</p>
@@ -64,6 +64,9 @@ function VendedoresPage() {
                         <button onClick={() => { setSelectedVendedor(null); setIsFormOpen(true); }} className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mr-4">
                             Añadir Vendedor
                         </button>
+                        <a href={`${apiClient.defaults.baseURL}/vendedores/export/`} target="_blank" rel="noopener noreferrer" className="bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded mr-4">
+                            Exportar .csv
+                        </a>
                         <Link to="/" className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded">
                             Volver al Dashboard
                         </Link>

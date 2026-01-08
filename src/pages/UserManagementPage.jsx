@@ -33,8 +33,10 @@ function UserManagementPage() {
     }, []);
 
     useEffect(() => {
-        fetchData();
-    }, [fetchData]);
+        if (['ADMIN', 'MANAGER'].includes(currentUser?.role)) {
+            fetchData();
+        }
+    }, [fetchData, currentUser]);
 
     const handleLocalChange = (userId, field, value) => {
         setUsers(prevUsers => prevUsers.map(u =>
@@ -70,7 +72,7 @@ function UserManagementPage() {
         }
     };
 
-    if (currentUser?.role !== 'ADMIN') {
+    if (!['ADMIN', 'MANAGER'].includes(currentUser?.role)) {
         return (
             <div className="p-8 text-center text-red-500">
                 <p>No tienes los permisos para realizar esta acción.</p>
@@ -145,7 +147,7 @@ function UserManagementPage() {
                                             <select
                                                 value={user.role}
                                                 onChange={(e) => handleLocalChange(user.id, 'role', e.target.value)}
-                                                disabled={user.role === 'ADMIN'}
+                                                disabled={user.role === 'ADMIN' || currentUser.role === 'MANAGER'}
                                                 className="p-1 border rounded-md disabled:bg-gray-200"
                                             >
                                                 <option value="ADMIN">Admin</option>
@@ -154,7 +156,7 @@ function UserManagementPage() {
                                             </select>
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap">
-                                            {user.role !== 'ADMIN' ? (
+                                            {currentUser.role === 'ADMIN' && user.role !== 'ADMIN' ? (
                                                 <select
                                                     value={user.sucursal || ''}
                                                     onChange={(e) => handleLocalChange(user.id, 'sucursal', e.target.value)}
@@ -166,7 +168,11 @@ function UserManagementPage() {
                                                     ))}
                                                 </select>
                                             ) : (
-                                                <span className="text-gray-500">N/A</span>
+                                                // Managers see the sucursal name (fixed)
+                                                // Or if it's admin viewing admin
+                                                <span className="text-gray-500">
+                                                    {sucursales.find(s => s.id === user.sucursal)?.nombre || 'N/A'}
+                                                </span>
                                             )}
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap space-x-2">
