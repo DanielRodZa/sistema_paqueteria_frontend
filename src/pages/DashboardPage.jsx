@@ -164,6 +164,8 @@ function DashboardPage() {
                             <th className="py-2 px-4 text-left">Fecha Creación</th>
                             <th className="py-2 px-4 text-left">Fecha Expiración</th>
                             <th className="py-2 px-4 text-left">Estado</th>
+                            <th className="py-2 px-4 text-left">Recibido Por</th>
+                            <th className="py-2 px-4 text-left">Entregado Por</th>
                             <th className="py-2 px-4 text-left">Costo</th>
                             <th className="py-2 px-4 text-left">Pagado</th>
                             <th className="py-2 px-4 text-left">Acciones</th>
@@ -182,6 +184,8 @@ function DashboardPage() {
                                         {op.estado.replace(/_/g, ' ')}
                                     </span>
                                 </td>
+                                <td className="py-2 px-4 whitespace-nowrap text-sm text-gray-600">{op.recibido_por_nombre || '-'}</td>
+                                <td className="py-2 px-4 whitespace-nowrap text-sm text-gray-600">{op.entregado_por_nombre || '-'}</td>
                                 <td className="py-2 px-4 font-semibold whitespace-nowrap">${parseFloat(op.costo).toFixed(2)}</td>
                                 <td className="py-2 px-4 whitespace-nowrap">
                                     {op.pagado ? <span className="text-green-600 font-bold">Sí</span> : <span className="text-red-600 font-bold">No</span>}
@@ -240,9 +244,11 @@ function DashboardPage() {
                             )}
 
                             {/* Manager and Admin links */}
-                            {['ADMIN', 'MANAGER'].includes(user?.role) && (
+                            {['ADMIN', 'MANAGER', 'RECEPCIONISTA'].includes(user?.role) && (
                                 <>
-                                    <Link to="/reportes" className="text-sm font-medium text-gray-700 hover:text-indigo-600">Reportes</Link>
+                                    {['ADMIN', 'MANAGER'].includes(user?.role) && (
+                                        <Link to="/reportes" className="text-sm font-medium text-gray-700 hover:text-indigo-600">Reportes</Link>
+                                    )}
                                     <Link to="/vendedores" className="text-sm font-medium text-gray-700 hover:text-indigo-600">Vendedores</Link>
                                 </>
                             )}
