@@ -19,8 +19,8 @@ const Ticket = React.forwardRef(({ operation, }, ref) => {
                     <img src={logo} alt="Logo de la Empresa" className="h-40 w-auto mx-auto mb-1" />
                 </div>
                 <h2 className="text-xl font-bold">Comprobante de Operación</h2>
-                <p className="text-xs text-gray-600 mt-1">{operation.sucursal_origen_nombre}</p>
-                <p className="text-xs text-gray-500">{operation.sucursal_origen.direccion}</p>
+                <p className="text-xs font-semibold text-black mt-1">{operation.sucursal_origen_nombre}</p>
+                <p className="text-xs font-semibold text-black">{operation.sucursal_origen.direccion}</p>
             </div>
 
             {/* --- 2. Folio y QR --- */}
@@ -75,7 +75,7 @@ const Ticket = React.forwardRef(({ operation, }, ref) => {
                 </div>
             </div>
 
-            <div className="text-center text-xs text-gray-600 mt-2">
+            <div className="text-center text-xs text-black mt-2 font-semibold">
                 {/* --- 5. Fechas --- */}
                 <p>Expedición: {new Date(operation.fecha_creacion).toLocaleString()}</p>
                 <p>Expiración: {operation.fecha_expiracion}</p>
