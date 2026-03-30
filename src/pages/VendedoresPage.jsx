@@ -46,6 +46,22 @@ function VendedoresPage() {
         }
     };
 
+    const handleExportCSV = async () => {
+        try {
+            const response = await apiClient.get('/vendedores/export/', { responseType: 'blob' });
+            const url = window.URL.createObjectURL(new Blob([response.data]));
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', 'reporte_vendedores.csv');
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+        } catch (error) {
+            console.error("Error exporting", error);
+            alert("Error al exportar");
+        }
+    };
+
     if (!['ADMIN', 'MANAGER', 'RECEPCIONISTA'].includes(user?.role)) {
         return (
             <div className="p-8 text-center text-red-500">
@@ -64,9 +80,9 @@ function VendedoresPage() {
                         <button onClick={() => { setSelectedVendedor(null); setIsFormOpen(true); }} className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mr-4">
                             Añadir Vendedor
                         </button>
-                        <a href={`${apiClient.defaults.baseURL}/vendedores/export/`} target="_blank" rel="noopener noreferrer" className="bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded mr-4">
+                        <button onClick={handleExportCSV} className="bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded mr-4">
                             Exportar .csv
-                        </a>
+                        </button>
                         <Link to="/" className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded">
                             Volver al Dashboard
                         </Link>

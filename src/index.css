@@ -8,11 +8,30 @@
         display: none !important;
     }
 
+    @page {
+        margin: 0;
+        size: auto;
+    }
+
+    body {
+        margin: 0;
+        padding: 0;
+    }
+
     /* El área de impresión se ajusta para la hoja */
     .printable-area {
-        position: absolute;
-        left: 0;
-        top: 0;
-        width: 100%;
+        position: static;
+        width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    /* Force the ticket to fill the paper width */
+    .printable-area > div {
+        width: 100% !important;
+        max-width: none !important;
+        margin: 0 !important;
+        padding: 2mm !important;
+        border: none !important;
     }
 }
