@@ -200,7 +200,7 @@ function NewOperationForm({ onSuccess }) {
     if (createdOperation) {
         return (
             <div>
-                <p className="text-center text-green-600 font-semibold mb-4">¡Operación creada con éxito!</p>
+                <p className="text-center text-green-600 font-semibold mb-4 no-print">¡Operación creada con éxito!</p>
 
 
                 <div className="printable-area">

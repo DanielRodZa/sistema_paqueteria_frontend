@@ -6,7 +6,7 @@ function Modal({ isOpen, onClose, title, children }) {
     return (
         <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center">
             <div className="bg-white rounded-lg shadow-xl w-full max-w-md">
-                <div className="flex justify-between items-center p-4 border-b">
+                <div className="flex justify-between items-center p-4 border-b no-print">
                     <h3 className="text-xl font-semibold text-gray-800">{title}</h3>
                     <button
                         onClick={onClose}
@@ -17,7 +17,7 @@ function Modal({ isOpen, onClose, title, children }) {
                         </svg>
                     </button>
                 </div>
-                <div className="p-4">
+                <div className="p-4 print:p-0">
                     {children}
                 </div>
             </div>
