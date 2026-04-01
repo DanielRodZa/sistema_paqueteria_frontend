@@ -8,8 +8,9 @@
         display: none !important;
     }
 
+    /* Solo quitamos el margen superior en la impresión */
     @page {
-        margin: 0;
+        margin-top: 0;
         size: auto;
     }
 
@@ -22,16 +23,12 @@
     .printable-area {
         position: static;
         width: 100% !important;
-        margin: 0 !important;
-        padding: 0 !important;
     }
 
-    /* Force the ticket to fill the paper width */
+    /* Dejamos que los paddings internos del Ticket controlen los laterales */
     .printable-area > div {
         width: 100% !important;
         max-width: none !important;
-        margin: 0 !important;
-        padding: 0 !important;
         border: none !important;
     }
 }

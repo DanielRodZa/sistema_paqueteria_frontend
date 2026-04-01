@@ -49,3 +49,6 @@ db.sqlite3-journal
 .vscode/
 *.swp
 *.swo
+
+# loop
+loop/
